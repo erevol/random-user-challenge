@@ -18,6 +18,24 @@ module.exports = merge.smart(common, {
           'css-loader',
         ],
       },
+      {
+        test: /\.ico$/,
+        loader: 'file-loader',
+      },
+      {
+        test: /\.(png|jpg|jpeg|svg|gif|ico)$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+        },
+      },
+      {
+        test: /\.(woff|woff2|ttf|eot|otf)$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+        },
+      },
     ],
   },
   plugins: [
