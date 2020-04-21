@@ -3,16 +3,18 @@ import PropTypes from 'prop-types';
 import { StyledContainer } from './styles';
 import UserCard from '../UserCard/UserCard';
 
-const UserList = ({ results }) => {
+const UserList = ({ group, onClick }) => {
 
   return (
     <StyledContainer>
       {
-        results.map((item) =>
+        group.map((item) =>
           <UserCard
             key={item.email}
-            image={item.picture.thumbnail}
-            name={item.name.first + ' ' + item.name.last}
+            item={item}
+            // image={item.picture.thumbnail}
+            // name={item.name.first + ' ' + item.name.last}
+            onClick={onClick}
           />)
       }
     </StyledContainer>
@@ -20,7 +22,8 @@ const UserList = ({ results }) => {
 };
 
 UserList.propTypes = {
-  results: PropTypes.array.isRequired,
+  group: PropTypes.array.isRequired,
+  onClick: PropTypes.func.isRequired,
 };
 
 export default UserList;

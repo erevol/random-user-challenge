@@ -7,10 +7,12 @@ import {
   Header,
 } from 'semantic-ui-react';
 import UserList from '../../components/UserList/UserList';
+import UserDetail from '../../components/UserDetail';
 
 const options = [
+  { key: 2, text: 'All', value: 2 },
+  { key: 0, text: 'Professors', value: 0 },
   { key: 1, text: 'Students', value: 1 },
-  { key: 2, text: 'Professors', value: 2 },
 ];
 
 class Main extends React.Component {
@@ -18,19 +20,23 @@ class Main extends React.Component {
     super(props);
     this.state = {
       results: [],
+      selectedGroup: 2,
+      selectedUser: {},
+      group: [],
     };
   }
 
   updateResults = (results) => {
     let newResults = [];
 
-    newResults = results.map(item => {
+    newResults = results.map((item, index) => {
       const random = Math.floor(Math.random() * 2);
 
       return {
         ...item,
         group: random === 0 ? 'Professors' : 'Students',
         groupValue: random,
+        id: index,
       };
     });
 
@@ -38,26 +44,55 @@ class Main extends React.Component {
   };
 
   hydrateStateWithLocalStorage = () => {
-    let results = localStorage.getItem('results');
+    let group = this.getLocalStorageKey('group');
+    let results = this.getLocalStorageKey('results');
 
     try {
+      group = JSON.parse(group);
       results = JSON.parse(results);
-      this.setState({ results });
+      this.setState({ group, results });
     } catch (e) {
-      this.setState({ results });
+      this.setState({ group, results });
     }
   };
 
+  getGroup = (selectedGroup) => {
+    const group = this.state.results;
+
+    if (group.length) {
+      if (selectedGroup === 2) {
+        return group;
+      }
+
+      return group.filter(user => {
+        return user.groupValue === selectedGroup;
+      });
+    }
+  };
+
+  setLocalStorageKey = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  };
+
+  getLocalStorageKey = (key) => {
+    return localStorage.getItem(key);
+  };
+
   componentDidMount() {
-    if (localStorage.hasOwnProperty('results')) {
+    if (localStorage.hasOwnProperty('group') && localStorage.hasOwnProperty('results')) {
+    // eslint-disable-next-line no-constant-condition
+    // if (false) {
       this.hydrateStateWithLocalStorage();
     } else {
-      axios.get('https://randomuser.me/api/1.3?results=50&seed=secret&nat=us')
+      axios.get('https://randomuser.me/api/1.3?results=10&seed=secret&nat=us')
         .then(res => {
           const results = res.data.results;
-          localStorage.setItem("results", JSON.stringify(this.updateResults(results)));
+          const group = this.updateResults(results);
+          this.setLocalStorageKey("group", group);
+          this.setLocalStorageKey("results", group);
           this.setState({
-            results,
+            results: group,
+            group,
           });
         })
         .catch(error => {
@@ -66,6 +101,29 @@ class Main extends React.Component {
         });
     }
   }
+
+  onChange = (e, data) => {
+    const selectedGroup = data.value;
+    const group = this.getGroup(selectedGroup);
+    this.setState({ selectedGroup, group });
+  };
+
+  handleSelectedUser = (selectedUser) => {
+    this.setState({ selectedUser });
+  };
+
+  // getUserDetail = () => {
+  //   const group = this.state.results;
+  //   const selectedUser = this.state.selectedUser;
+
+  //   if (group.length) {
+  //     return group.filter(user => {
+  //       return user.id === selectedUser;
+  //     });
+  //   }
+
+  //   return false;
+  // };
 
   render() {
     return (
@@ -77,12 +135,21 @@ class Main extends React.Component {
             <p>If you want to get contact information to specific user,
               just select group and then select him from the list below</p>
             <Header as='h3'>Select group of users</Header>
-            <Dropdown placeholder='e.g. Students' clearable options={options} selection />
-            {this.state.results.length ?
-              <UserList results={this.state.results} /> : <p>Loading...</p>}
+            <Dropdown
+              defaultValue={this.state.selectedGroup}
+              options={options}
+              selection
+              onChange={this.onChange}
+            />
+            {this.state.group.length ?
+              <UserList
+                group={this.state.group}
+                onClick={this.handleSelectedUser}
+              /> : <p>Loading...</p>}
           </Grid.Column>
           <Grid.Column>
-            <div style={{ backgroundColor: 'green', height: '100%' }}></div>
+            {this.state.results.length ?
+              <UserDetail user={this.state.selectedUser} /> : <p>No user data</p>}
           </Grid.Column>
         </Grid>
       </Container>
