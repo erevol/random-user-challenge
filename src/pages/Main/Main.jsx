@@ -6,13 +6,15 @@ import {
   Grid,
   Header,
 } from 'semantic-ui-react';
+
 import UserList from '../../components/UserList/UserList';
 import UserDetail from '../../components/UserDetail';
+import ScrollToTop from '../../components/ScrollToTop';
 
 const options = [
   { key: 2, text: 'All', value: 2 },
-  { key: 0, text: 'Professors', value: 0 },
-  { key: 1, text: 'Students', value: 1 },
+  { key: 0, text: 'Professor', value: 0 },
+  { key: 1, text: 'Student', value: 1 },
 ];
 
 class Main extends React.Component {
@@ -34,7 +36,7 @@ class Main extends React.Component {
 
       return {
         ...item,
-        group: random === 0 ? 'Professors' : 'Students',
+        group: random === 0 ? 'Professor' : 'Student',
         groupValue: random,
         id: index,
       };
@@ -50,9 +52,9 @@ class Main extends React.Component {
     try {
       group = JSON.parse(group);
       results = JSON.parse(results);
-      this.setState({ group, results });
+      this.setState({ group, results, selectedUser: group[0] });
     } catch (e) {
-      this.setState({ group, results });
+      this.setState({ group, results, selectedUser: group[0] });
     }
   };
 
@@ -80,8 +82,6 @@ class Main extends React.Component {
 
   componentDidMount() {
     if (localStorage.hasOwnProperty('group') && localStorage.hasOwnProperty('results')) {
-    // eslint-disable-next-line no-constant-condition
-    // if (false) {
       this.hydrateStateWithLocalStorage();
     } else {
       axios.get('https://randomuser.me/api/1.3?results=10&seed=secret&nat=us')
@@ -93,6 +93,7 @@ class Main extends React.Component {
           this.setState({
             results: group,
             group,
+            selectedUser: group[0],
           });
         })
         .catch(error => {
@@ -112,23 +113,9 @@ class Main extends React.Component {
     this.setState({ selectedUser });
   };
 
-  // getUserDetail = () => {
-  //   const group = this.state.results;
-  //   const selectedUser = this.state.selectedUser;
-
-  //   if (group.length) {
-  //     return group.filter(user => {
-  //       return user.id === selectedUser;
-  //     });
-  //   }
-
-  //   return false;
-  // };
-
   render() {
     return (
       <Container style={{ marginTop: '30px' }}>
-        <Header as='h1'>Random User Code Challenge</Header>
         <Grid container columns={2} stackable>
           <Grid.Column>
             <Header as='h2'>Users</Header>
@@ -148,8 +135,9 @@ class Main extends React.Component {
               /> : <p>Loading...</p>}
           </Grid.Column>
           <Grid.Column>
-            {this.state.results.length ?
+            {this.state.selectedUser.picture ?
               <UserDetail user={this.state.selectedUser} /> : <p>No user data</p>}
+            <ScrollToTop />
           </Grid.Column>
         </Grid>
       </Container>

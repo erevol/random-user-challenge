@@ -12,8 +12,6 @@ const UserList = ({ group, onClick }) => {
           <UserCard
             key={item.email}
             item={item}
-            // image={item.picture.thumbnail}
-            // name={item.name.first + ' ' + item.name.last}
             onClick={onClick}
           />)
       }
