@@ -2,7 +2,7 @@
 
 
 #### Demo
-You can see a Demo at:
+You can see a Demo at: https://erevol.github.io/random-user-challenge/
 
 ### Install Locally
 
@@ -32,6 +32,29 @@ $ npm build
 ```
 
 A `dist` folder will be created with index.html and bundle.js files
+
+Make sure git knows about your subtree (the subfolder with your site).
+
+```sh
+git add dist
+```
+
+or force-add it if you don't want to change your `.gitignore`
+
+```sh
+git add dist -f
+```
+Remember to commit!
+
+```sh
+git commit -m "gh-pages commit!"
+```
+
+Use subtree push to send it to the `gh-pages` branch on GitHub.
+
+```sh
+git subtree push --prefix dist origin gh-pages
+```
 
 ## Used Libraries
 
