@@ -12,7 +12,7 @@ To get the app running locally clone the repository
 $ git clone https://github.com/erevol/random-user-challenge
 ```
 
-Move into olapic-challenge folder and install the dependencies
+Move into folder and install the dependencies
 
 ```bash
 $ cd random-user-challenge
